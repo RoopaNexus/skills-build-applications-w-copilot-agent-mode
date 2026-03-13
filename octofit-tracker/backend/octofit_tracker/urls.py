@@ -16,11 +16,22 @@ Including another URLconf
 from django.contrib import admin
 
 from django.urls import path
+from django.http import JsonResponse
+import os
 from octofit_tracker.api.views import (
     UserList, TeamList, ActivityList, LeaderboardList, WorkoutList
 )
 
+def api_root(request):
+    codespace_name = os.environ.get('CODESPACE_NAME')
+    if codespace_name:
+        api_url = f"https://{codespace_name}-8000.app.github.dev/api/"
+    else:
+        api_url = "http://localhost:8000/api/"
+    return JsonResponse({"api_base_url": api_url})
+
 urlpatterns = [
+    path('', api_root, name='api-root'),
     path('admin/', admin.site.urls),
     path('api/users/', UserList.as_view(), name='user-list'),
     path('api/teams/', TeamList.as_view(), name='team-list'),
